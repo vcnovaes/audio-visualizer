@@ -2,29 +2,15 @@ import numpy as np
 from pydub import AudioSegment
 import pygame
 from pydub.playback import play
+from audio.audio_segment import Audio
 import threading
 import time
 
-
-def play_audio(audio):
-    play(audio)
-
-
-
-# Load WAV file
-audio = AudioSegment.from_file("assets/capitain.wav", format="wav")
-samples = np.array(audio.get_array_of_samples())
-
-# Convert stereo to mono (if needed)
-if audio.channels == 2:
-    samples = samples.reshape((-1, 2))
-    samples = samples.mean(axis=1)
-
-# Normalize samples to range (-1, 1)
-samples = samples / np.max(np.abs(samples))
-
+saudio = Audio("./assets/capitain.mp3")
+samples = saudio.samples
+audio = saudio.audio
 # Pygame setup
-WIDTH, HEIGHT = 800, 400
+WIDTH, HEIGHT = 1200, 800
 FPS = 60
 CHUNK_SIZE = 500  # Number of samples to display at a time
 
@@ -37,6 +23,7 @@ clock = pygame.time.Clock()
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 
+
 def draw_waveform(screen, samples, chunk_start, chunk_size):
     """
     Draws a chunk of the waveform on the screen.
@@ -48,20 +35,28 @@ def draw_waveform(screen, samples, chunk_start, chunk_size):
         chunk_size (int): The number of samples in the chunk.
     """
     screen.fill(BLACK)  # Clear the screen
-    chunk = samples[chunk_start:chunk_start + chunk_size]
-    bar_width = max(WIDTH // chunk_size, 1)  # Ensure bar_width is at least 1
-    bar_width = 3
+    chunk = samples[chunk_start : chunk_start + chunk_size]
+    bar_width = max(WIDTH // chunk_size, 5)  # Ensure bar_width is at least 1
     center_y = HEIGHT // 2
 
     for i, sample in enumerate(chunk):
         bar_height = int(sample * (HEIGHT // 2))  # Scale sample to screen height
+        bar_height = max(
+            min(bar_height, HEIGHT // 2 - 1), -(HEIGHT // 2 - 1)
+        )  # Clamp to screen height
+
         x = i * bar_width
-        pygame.draw.rect(screen, RED, (x, center_y - bar_height, bar_width - 1, bar_height * 2))
+        pygame.draw.rect(
+            screen,
+            ((255 - abs(bar_height)) % 255, 0, 0),
+            (x, center_y - bar_height, bar_width - 1, bar_height * 2),
+        )
+
 
 running = True
 chunk_start = 0
 
-audio_thread = threading.Thread(target=play_audio, args=(audio,))
+audio_thread = threading.Thread(target=saudio.play)
 
 start_time = time.time()
 audio_thread.start()
