@@ -1,6 +1,6 @@
-# Waview - An minimal audio visualizer
+# Waview - A minimal audio visualizer
 
-This is a audio visualizer that supports `.mp3` and `.wav` files. Also, you can use your personal configuration for the animation, setting colors and velocity.
+Waview is a minimal audio visualizer designed for simplicity and ease of use. It supports `.mp3` and `.wav` files, allowing you to enjoy your music with visually appealing animations. What makes it minimal is its lightweight design and straightforward interface, requiring no complex setup. Additionally, you can personalize the animations by configuring colors and velocity to suit your preferences.
 
 To install locally you will need to clone this repository and on the root folder you should run:
 
@@ -12,3 +12,5 @@ And then you can just run:
 
 For more instructions run:
 `waview --help`
+
+There are several test assets in the `/assets` folder that you can try out!
