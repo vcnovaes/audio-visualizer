@@ -8,9 +8,15 @@ To install locally you will need to clone this repository and on the root folder
 
 And then you can just run:
 
-`waview {your_song}`
+`waview {your_song/directory}`
 
 For more instructions run:
 `waview --help`
 
 There are several test assets in the `/assets` folder that you can try out!
+
+### Commands
+
+- `P`: play/pause the current song
+- `Q`: quit
+- `N`: play next song in the queue
