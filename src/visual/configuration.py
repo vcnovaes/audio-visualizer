@@ -1,5 +1,10 @@
 from visual.elements import Canvas, AnimationSetting, DisplayElementStyle
 import yaml
+from visual.strategies import *
+from visual.strategies.default_strategy import NoTransformStrategy
+from visual.strategies.fft_smooth_strategy import FFTSmoothStrategy
+from visual.strategies.fft_strategy import FFTStrategy
+from visual.strategies.time_domain_envelope_strategy import TimeDomainEnvelopeStrategy
 
 DEFAULT_CONFIG = "visual_config.yaml"
 
@@ -31,19 +36,16 @@ class VisualConfig:
     def get_transformation_strategy(self):
         match self.raw_transformation:
             case "fft":
-                from visual.strategies.fft_strategy import FFTStrategy
 
                 return FFTStrategy(self.animation.chunk_size)
-            case "time_smoothing":
-                from visual.strategies.time_domain_envelope_strategy import (
-                    TimeDomainEnvelopeStrategy,
-                )
+            case "time_smooth":
 
                 return TimeDomainEnvelopeStrategy()
             case "none":
-                from visual.strategies.default_strategy import NoTransformStrategy
-
                 return NoTransformStrategy()
-
+            case "fft_smooth":
+                return FFTSmoothStrategy(
+                    self.animation.chunk_size, TimeDomainEnvelopeStrategy()
+                )
             case _:
                 raise ValueError("Invalid or unsupported transformation")

@@ -11,8 +11,8 @@ colors:
 # Audio settings
 audio:
   chunk_size: 1024
-  transformation: "time_smoothing"
-  symmetric: false
+  transformation: "fft_smooth"
+  symmetric: true
 # Animation settings
 animation:
   fps: 60
