@@ -1,11 +1,12 @@
+from audio.audio_factory import AudioFactory
 from audio.audio_segment import Audio
+from controller.controller import Controller
+from interface import pprint
+from interface.execution_queue import get_execution_queue
 from visual.configuration import DEFAULT_CONFIG, VisualConfig
 from visual.draw import Drawing
 from threading import Thread
 import typer
-from visual.strategies.default_strategy import NoTransformStrategy
-from visual.strategies.fft_strategy import FFTStrategy
-from visual.strategies.time_domain_envelope_strategy import TimeDomainEnvelopeStrategy
 
 app = typer.Typer()
 
@@ -19,13 +20,17 @@ def main(
         DEFAULT_CONFIG, help="Visual configuration, if not provided, default is used"
     ),
 ):
-    audio = Audio(file)
+
+    execution_queue = get_execution_queue(file)
+    pprint.print_execution_queue(execution_queue)
     configuration = VisualConfig(config)
-    drawing = Drawing(configuration, audio, TimeDomainEnvelopeStrategy())
-    player_thread = Thread(target=audio.play)
-    player_thread.start()
+    drawing = Drawing(
+        configuration,
+        controller=Controller(execution_queue, AudioFactory()),
+        audio_transform_strategy=configuration.get_transformation_strategy(),
+    )
     drawing.run()
-    player_thread.join()
+
     exit(0)
 
 

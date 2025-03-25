@@ -44,7 +44,8 @@ class DisplayElementStyle:
 
 
 class AnimationSetting:
-    def __init__(self, chunk_size, fps):
+    def __init__(self, chunk_size, fps, symmetric: bool):
         self.chunk_size = chunk_size
         self.fps = fps
+        self.symmetric: bool = symmetric
         pass

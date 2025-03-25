@@ -1,11 +1,7 @@
-import numpy as np
-from pydub import AudioSegment
 import pygame
-from pydub.playback import play
-from audio.audio_segment import Audio
 import time
-from numpy.fft import fft
 
+from controller.controller import Controller
 from visual.configuration import VisualConfig
 from visual.strategies.audio_transform_strategy import AudioTransformationStrategy
 
@@ -15,19 +11,23 @@ class Drawing:
     def __init__(
         self,
         config: VisualConfig,
-        audio: Audio,
+        controller: Controller,
         audio_transform_strategy: AudioTransformationStrategy,
     ):
-        self.audio = audio
+        self.controller = controller
         self.config = config
         pygame.init()
-
+        self.controller.load_next_audio()
         self.screen = pygame.display.set_mode(
             (self.config.canvas.width, self.config.canvas.height)
         )
         self.clock = pygame.time.Clock()
         self.transform_strategy = audio_transform_strategy
-        self.virtual_axis = self.config.canvas.height // 2
+        self.virtual_axis = (
+            self.config.canvas.height // 2
+            if self.config.animation.symmetric
+            else self.config.canvas.height
+        )
 
         self.bar_width = self.__calculate_bar_width()
 
@@ -57,7 +57,7 @@ class Drawing:
         chunk_end = chunk_start + self.config.animation.chunk_size
 
         chunk = self.transform_strategy.transform(
-            self.audio.get_chunk(chunk_start, chunk_end)
+            self.controller.current_audio.get_chunk(chunk_start, chunk_end)
         )
         self.__draw_audio_chunk(chunk)
 
@@ -76,11 +76,24 @@ class Drawing:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
-
+                if event.type == pygame.KEYDOWN:
+                    self.controller.execute_command(event.key)
             # Draw the current chunk of the waveform
-
+            if self.controller.state == Controller.State.PAUSED:
+                self.draw_waveform(chunk_start)
+                pygame.display.flip()
+                continue
+            if self.controller.state == Controller.State.STOPPED:
+                running = False
+                pygame.display.flip()
+                continue
+            if self.controller.state == Controller.State.UPDATING:
+                pygame.display.flip()
+                continue
             elapsed_time = time.time() - start_time
-            current_sample = int(elapsed_time * self.audio.frame_rate)
+            current_sample = int(
+                elapsed_time * self.controller.current_audio.frame_rate
+            )
 
             # Calculate the chunk_start based on the current playback position
             chunk_start = current_sample
@@ -89,7 +102,7 @@ class Drawing:
                 self.config.animation.chunk_size // 10
             )  # Move forward by a fraction of the chunk size
 
-            if chunk_start >= self.audio.n_samples():
+            if chunk_start >= self.controller.current_audio.n_samples():
                 chunk_start = 0  # Loop back to the start
 
             self.draw_waveform(chunk_start)
