@@ -57,5 +57,4 @@ class Controller:
             self.state = Controller.State.STOPPED
             return None
         else:
-            print(command_key)
-            raise ValueError("Invalid command key", command_key)
+            print(ValueError("Invalid command key", command_key))
