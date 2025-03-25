@@ -2,6 +2,7 @@ from audio.audio_formatter import AudioFormatter
 from pydub import AudioSegment
 from numpy import array
 from pydub import playback
+from numpy.fft import fft
 
 
 class Audio:
@@ -25,6 +26,9 @@ class Audio:
 
     def play(self):
         playback.play(self.audio)
+
+    def get_chunk(self, start, end):
+        return self.samples[start:end]
 
     def calculate_samples(self):
         samples = array(self.audio.get_array_of_samples())

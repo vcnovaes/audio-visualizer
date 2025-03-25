@@ -26,6 +26,22 @@ class DisplayElementStyle:
         self.background_color = self.hex_to_tuple(background_color)
         self.bar_color = self.hex_to_tuple(bar_color)
 
+    def color_bar_with_gradient(self, factor, offset=100):
+        return self.__apply_gradient(self.bar_color, factor, offset)
+
+    def __apply_gradient(self, color, factor, offset):
+        """
+        Applies a gradient to a color.
+
+        Parameters:
+            color (tuple): The RGB color tuple.
+            factor (float): The gradient factor.
+
+        Returns:
+            tuple: The RGB color tuple with the gradient applied.
+        """
+        return tuple(min(c * factor + offset, 255) for c in color)
+
 
 class AnimationSetting:
     def __init__(self, chunk_size, fps):

@@ -1,18 +1,16 @@
 # Canvas settings
 canvas:
-  width: 800
-  height: 400
+  width: 1200
+  height: 800
 
 # Colors
 colors:
-  background: "#000000" # Black
-  bar: "#FF0000" # Red
+  background: "#FFF00"
+  bar: "#F1A51"
 
 # Audio settings
 audio:
-  chunk_size: 500
-  frame_rate: 44100
-
+  chunk_size: 1024
 # Animation settings
 animation:
   fps: 60
